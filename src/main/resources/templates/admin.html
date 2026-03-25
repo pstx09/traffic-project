@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Traffic Admin Dashboard</title>
+</head>
+<body>
+
+<h1>Traffic Admin Dashboard</h1>
+
+<a href="/addViolation">Add New Violation</a>
+
+<br><br>
+
+<!-- SEARCH BAR -->
+<h3>Search by Vehicle Number</h3>
+
+<form action="/admin" method="get">
+    <input type="text" name="keyword" placeholder="Enter vehicle number" th:value="${keyword}">
+    <button type="submit">Search</button>
+</form>
+
+<br>
+
+<table border="1">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Vehicle Number</th>
+<th>Violation Type</th>
+<th>Fine Amount</th>
+<th>Evidence</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr th:each="v : ${violations}">
+
+<td th:text="${v.id}"></td>
+<td th:text="${v.vehicleNumber}"></td>
+<td th:text="${v.violationType}"></td>
+<td th:text="${v.fineAmount}"></td>
+
+<td>
+    <img th:if="${v.imageName != null}"
+         th:src="@{'/' + ${v.imageName}}"
+         width="120"/>
+</td>
+
+<!-- STATUS COLUMN -->
+<td>
+    <span th:if="${v.paid}" style="color:green;">PAID</span>
+    <span th:unless="${v.paid}" style="color:red;">UNPAID</span>
+</td>
+
+<!-- ACTION COLUMN -->
+<td>
+
+    <!-- SHOW ONLY IF UNPAID -->
+    <a th:if="${!v.paid}" th:href="@{'/deleteViolation/' + ${v.id}}">
+        <button>Mark as Paid</button>
+    </a>
+
+    <br><br>
+
+    <!-- SHOW ONLY IF PAID -->
+    <a th:if="${v.paid}" th:href="@{'/downloadReceipt/' + ${v.id}}">
+        <button>Download Receipt</button>
+    </a>
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</body>
+</html>

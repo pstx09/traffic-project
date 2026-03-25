@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Your Traffic Fines</title>
+</head>
+<body>
+
+<h2>Violation Details</h2>
+
+<table border="1">
+
+<tr>
+<th>Vehicle</th>
+<th>Violation</th>
+<th>Fine</th>
+</tr>
+
+<tr th:each="v : ${violations}">
+<td th:text="${v.vehicleNumber}"></td>
+<td th:text="${v.violationType}"></td>
+<td th:text="${v.fineAmount}"></td>
+</tr>
+
+</table>
+
+<h3>Total Fine: ₹ <span th:text="${totalFine}"></span></h3>
+
+<br>
+
+<!-- ✅ SHOW MESSAGE IF PAID -->
+<h3 style="color:green;" th:if="${paid}">
+    Payment Successful ✅
+</h3>
+
+<!-- ❌ SHOW QR ONLY IF NOT PAID -->
+<div th:if="${!paid}">
+
+    <h3>Scan QR to Pay</h3>
+
+    <img th:src="@{'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9381184308@axl&pn=TrafficFine&am=' + ${totalFine} + '&cu=INR'}"/>
+
+    <br><br>
+
+    <a th:href="@{'/checkPayment/' + ${violations[0].vehicleNumber}}">
+        <button>Check Payment Status</button>
+    </a>
+
+</div>
+
+<br><br>
+
+<!-- ✅ DOWNLOAD BUTTON ONLY AFTER PAYMENT -->
+<div th:if="${paid}">
+    <a th:href="@{'/downloadReceiptByVehicle/' + ${violations[0].vehicleNumber}}">
+        <button>Download Receipt</button>
+    </a>
+</div>
+
+</body>
+</html>

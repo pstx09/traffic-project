@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Add Traffic Violation</title>
+</head>
+
+<body>
+
+<h2>Add Traffic Violation</h2>
+
+<form action="/saveViolation" method="post" enctype="multipart/form-data">
+
+    <label>Vehicle Number:</label><br>
+    <input type="text" name="vehicleNumber" required>
+    <br><br>
+
+    <label>Violation Type:</label><br>
+    <input type="text" name="violationType" required>
+    <br><br>
+
+    <label>Fine Amount:</label><br>
+    <input type="number" name="fineAmount" required>
+    <br><br>
+
+    <label>Upload Violation Image:</label><br>
+    <input type="file" name="imageFile" accept="image/*" onchange="previewImage(event)">
+    <br><br>
+
+    <p>Image Preview:</p>
+    <img id="preview" width="200" style="display:none; border:1px solid black;">
+    <br><br>
+
+    <button type="submit">Submit</button>
+
+</form>
+
+<br>
+<a href="/admin">Back to Admin Dashboard</a>
+
+<script>
+
+function previewImage(event) {
+
+    var reader = new FileReader();
+
+    reader.onload = function() {
+        var output = document.getElementById('preview');
+        output.src = reader.result;
+        output.style.display = "block";
+    };
+
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+</script>
+
+</body>
+</html>
