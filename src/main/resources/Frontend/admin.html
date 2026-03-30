@@ -1,83 +1,141 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Traffic Admin Dashboard</title>
+    <title>Admin Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+        }
+
+        .header {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 22px;
+        }
+
+        .container {
+            width: 90%;
+            margin: 30px auto;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 8px;
+            width: 250px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .add-btn {
+            background: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .add-btn:hover {
+            background: #218838;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: #343a40;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .paid {
+            color: green;
+            font-weight: bold;
+        }
+
+        .unpaid {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Traffic Admin Dashboard</h1>
+<div class="header">
+    🚦 Traffic Admin Dashboard
+</div>
 
-<a href="/addViolation">Add New Violation</a>
+<div class="container">
 
-<br><br>
+    <!-- SEARCH -->
+    <form method="get" action="/admin" class="search-box">
+        <input type="text" name="keyword" placeholder="Search Vehicle..." th:value="${keyword}">
+        <button type="submit">Search</button>
+    </form>
 
-<!-- SEARCH BAR -->
-<h3>Search by Vehicle Number</h3>
-
-<form action="/admin" method="get">
-    <input type="text" name="keyword" placeholder="Enter vehicle number" th:value="${keyword}">
-    <button type="submit">Search</button>
-</form>
-
-<br>
-
-<table border="1">
-
-<thead>
-<tr>
-<th>ID</th>
-<th>Vehicle Number</th>
-<th>Violation Type</th>
-<th>Fine Amount</th>
-<th>Evidence</th>
-<th>Status</th>
-<th>Action</th>
-</tr>
-</thead>
-
-<tbody>
-
-<tr th:each="v : ${violations}">
-
-<td th:text="${v.id}"></td>
-<td th:text="${v.vehicleNumber}"></td>
-<td th:text="${v.violationType}"></td>
-<td th:text="${v.fineAmount}"></td>
-
-<td>
-    <img th:if="${v.imageName != null}"
-         th:src="@{'/' + ${v.imageName}}"
-         width="120"/>
-</td>
-
-<!-- STATUS COLUMN -->
-<td>
-    <span th:if="${v.paid}" style="color:green;">PAID</span>
-    <span th:unless="${v.paid}" style="color:red;">UNPAID</span>
-</td>
-
-<!-- ACTION COLUMN -->
-<td>
-
-    <!-- SHOW ONLY IF UNPAID -->
-    <a th:if="${!v.paid}" th:href="@{'/deleteViolation/' + ${v.id}}">
-        <button>Mark as Paid</button>
+    <!-- ADD BUTTON -->
+    <a href="/addViolation">
+        <button class="add-btn">+ Add Violation</button>
     </a>
 
-    <br><br>
+    <!-- TABLE -->
+    <table>
+        <tr>
+            <th>Vehicle</th>
+            <th>Violation</th>
+            <th>Fine</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
 
-    <!-- SHOW ONLY IF PAID -->
-    <a th:if="${v.paid}" th:href="@{'/downloadReceipt/' + ${v.id}}">
-        <button>Download Receipt</button>
-    </a>
+        <tr th:each="v : ${violations}">
+            <td th:text="${v.vehicleNumber}"></td>
+            <td th:text="${v.violationType}"></td>
+            <td>₹ <span th:text="${v.fineAmount}"></span></td>
 
-</td>
+            <td>
+                <span th:if="${v.paid}" class="paid">Paid</span>
+                <span th:if="${!v.paid}" class="unpaid">Unpaid</span>
+            </td>
 
-</tr>
+            <td>
+                <a th:if="${!v.paid}" th:href="@{'/deleteViolation/' + ${v.id}}">
+                    <button>Mark Paid</button>
+                </a>
+            </td>
+        </tr>
 
-</tbody>
+    </table>
 
-</table>
+</div>
 
 </body>
 </html>
