@@ -20,7 +20,7 @@ public class violationController {
     @Autowired
     private violationRepository repository;
 
-    // FIRST PAGE (Login)
+    // LOGIN PAGE
     @GetMapping("/")
     public String loginPage() {
         return "login";
@@ -34,14 +34,13 @@ public class violationController {
 
         if(username.equals("admin") && password.equals("admin123")) {
             return "redirect:/admin";
-        } 
-        else {
+        } else {
             model.addAttribute("error", "Invalid username or password");
             return "login";
         }
     }
 
-    // ADMIN DASHBOARD WITH SEARCH
+    // ADMIN DASHBOARD
     @GetMapping("/admin")
     public String adminPage(@RequestParam(required = false) String keyword, Model model) {
 
@@ -59,14 +58,14 @@ public class violationController {
         return "admin";
     }
 
-    // OPEN ADD FORM
+    // ADD FORM
     @GetMapping("/addViolation")
     public String showAddForm(Model model) {
         model.addAttribute("violation", new violation());
         return "addViolation";
     }
 
-    // SAVE VIOLATION WITH IMAGE
+    // SAVE VIOLATION + IMAGE
     @PostMapping("/saveViolation")
     public String saveViolation(
             @RequestParam("vehicleNumber") String vehicleNumber,
@@ -101,7 +100,7 @@ public class violationController {
         return "redirect:/admin";
     }
 
-    // MARK AS PAID (ADMIN)
+    // MARK PAID
     @GetMapping("/deleteViolation/{id}")
     public String deleteViolation(@PathVariable Long id) {
 
@@ -115,13 +114,13 @@ public class violationController {
         return "redirect:/admin";
     }
 
-    // OPEN VEHICLE SEARCH PAGE (USER)
+    // CHECK PAGE
     @GetMapping("/checkFine")
     public String openCheckFinePage() {
         return "checkFine";
     }
 
-    // CHECK FINES (MAIN LOGIC)
+    // CHECK FINES
     @PostMapping("/checkFine")
     public String checkFine(@RequestParam String vehicleNumber, Model model) {
 
@@ -137,7 +136,6 @@ public class violationController {
 
         for(violation v : list){
             total += v.getFineAmount();
-
             if(!v.isPaid()) {
                 isPaid = false;
             }
@@ -162,7 +160,6 @@ public class violationController {
         }
 
         double total = 0;
-
         for(violation v : list){
             total += v.getFineAmount();
         }
@@ -174,17 +171,22 @@ public class violationController {
         return "fineResult";
     }
 
-    // ✅ SERVE IMAGE (NO EXTRA FILE NEEDED)
+    // ✅ FIXED IMAGE SERVING (IMPORTANT)
     @GetMapping("/uploads/{filename}")
     @ResponseBody
     public byte[] getImage(@PathVariable String filename) throws IOException {
 
-        File file = new File("uploads/" + filename);
+        String uploadDir = System.getProperty("user.dir") + "/uploads/";
+        File file = new File(uploadDir + filename);
+
+        if(!file.exists()) {
+            return new byte[0]; // prevent crash
+        }
 
         return Files.readAllBytes(file.toPath());
     }
 
-    // USER RECEIPT DOWNLOAD
+    // RECEIPT
     @GetMapping("/downloadReceiptByVehicle/{vehicleNumber}")
     @ResponseBody
     public String downloadReceiptByVehicle(@PathVariable String vehicleNumber) {
