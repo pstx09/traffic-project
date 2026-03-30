@@ -2,6 +2,7 @@ package com.example.traffic.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,28 +36,28 @@ public class violationController {
             return "redirect:/admin";
         } 
         else {
-            model.addAttribute("error", true);
+            model.addAttribute("error", "Invalid username or password");
             return "login";
         }
     }
 
     // ADMIN DASHBOARD WITH SEARCH
-   @GetMapping("/admin")
-public String adminPage(@RequestParam(required = false) String keyword, Model model) {
+    @GetMapping("/admin")
+    public String adminPage(@RequestParam(required = false) String keyword, Model model) {
 
-    List<violation> list;
+        List<violation> list;
 
-    if(keyword != null && !keyword.isEmpty()) {
-        list = repository.findByVehicleNumberContaining(keyword);
-    } else {
-        list = repository.findByPaidFalse(); // 🔥 ONLY UNPAID
+        if(keyword != null && !keyword.isEmpty()) {
+            list = repository.findByVehicleNumberContaining(keyword);
+        } else {
+            list = repository.findByPaidFalse();
+        }
+
+        model.addAttribute("violations", list);
+        model.addAttribute("keyword", keyword);
+
+        return "admin";
     }
-
-    model.addAttribute("violations", list);
-    model.addAttribute("keyword", keyword);
-
-    return "admin";
-}
 
     // OPEN ADD FORM
     @GetMapping("/addViolation")
@@ -144,24 +145,22 @@ public String adminPage(@RequestParam(required = false) String keyword, Model mo
 
         model.addAttribute("violations", list);
         model.addAttribute("totalFine", total);
-        model.addAttribute("paid", isPaid); // 🔥 IMPORTANT
+        model.addAttribute("paid", isPaid);
 
         return "fineResult";
     }
 
-    // ✅ FIXED PAYMENT CHECK (NO MORE CRASH)
+    // PAYMENT CHECK
     @GetMapping("/checkPayment/{vehicleNumber}")
     public String checkPayment(@PathVariable String vehicleNumber, Model model) {
 
         List<violation> list = repository.findByVehicleNumber(vehicleNumber);
 
-        // simulate payment success
         for(violation v : list) {
             v.setPaid(true);
             repository.save(v);
         }
 
-        // 🔥 RETURN SAME PAGE WITH DATA (NOT REDIRECT)
         double total = 0;
 
         for(violation v : list){
@@ -173,6 +172,16 @@ public String adminPage(@RequestParam(required = false) String keyword, Model mo
         model.addAttribute("paid", true);
 
         return "fineResult";
+    }
+
+    // ✅ SERVE IMAGE (NO EXTRA FILE NEEDED)
+    @GetMapping("/uploads/{filename}")
+    @ResponseBody
+    public byte[] getImage(@PathVariable String filename) throws IOException {
+
+        File file = new File("uploads/" + filename);
+
+        return Files.readAllBytes(file.toPath());
     }
 
     // USER RECEIPT DOWNLOAD
@@ -208,5 +217,4 @@ public String adminPage(@RequestParam(required = false) String keyword, Model mo
 
         return receipt.toString();
     }
-
 }

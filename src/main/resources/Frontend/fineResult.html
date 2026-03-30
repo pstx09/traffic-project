@@ -12,7 +12,7 @@
         }
 
         .container {
-            width: 60%;
+            width: 70%;
             margin: 60px auto;
             background: #fff;
             padding: 30px;
@@ -43,6 +43,10 @@
             border-bottom: 1px solid #ddd;
         }
 
+        img {
+            border-radius: 8px;
+        }
+
         .total {
             font-size: 18px;
             font-weight: bold;
@@ -65,7 +69,6 @@
 
         .qr-section img {
             margin-top: 10px;
-            border-radius: 10px;
         }
 
         .btn {
@@ -105,12 +108,20 @@
             <th>Vehicle</th>
             <th>Violation</th>
             <th>Fine</th>
+            <th>Proof</th> <!-- 🔥 NEW COLUMN -->
         </tr>
 
         <tr th:each="v : ${violations}">
             <td th:text="${v.vehicleNumber}"></td>
             <td th:text="${v.violationType}"></td>
             <td>₹ <span th:text="${v.fineAmount}"></span></td>
+
+            <!-- 🔥 IMAGE DISPLAY -->
+            <td>
+                <img th:if="${v.imageName != null}"
+                     th:src="@{'/uploads/' + ${v.imageName}}"
+                     width="120" height="90"/>
+            </td>
         </tr>
     </table>
 
