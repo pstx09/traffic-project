@@ -3,13 +3,59 @@
 
 <head>
     <title>Add Traffic Violation</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            text-align: center;
+        }
+
+        .container {
+            width: 40%;
+            margin: 50px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        img {
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 
 <body>
 
-<h2>Add Traffic Violation</h2>
+<div class="container">
 
-<form action="/saveViolation" method="post" enctype="multipart/form-data">
+<h2>🚓 Add Traffic Violation</h2>
+
+<form action="/saveViolation" method="post">
 
     <label>Vehicle Number:</label><br>
     <input type="text" name="vehicleNumber" required>
@@ -23,12 +69,15 @@
     <input type="number" name="fineAmount" required>
     <br><br>
 
-    <label>Upload Violation Image:</label><br>
-    <input type="file" name="imageFile" accept="image/*" onchange="previewImage(event)">
+    <!-- 🔥 NEW: IMAGE URL INPUT -->
+    <label>Violation Image URL:</label><br>
+    <input type="text" id="imageUrl" name="imageUrl" 
+           placeholder="Paste direct image link (.jpg/.png)" 
+           oninput="previewImage()">
     <br><br>
 
     <p>Image Preview:</p>
-    <img id="preview" width="200" style="display:none; border:1px solid black;">
+    <img id="preview" width="200" style="display:none;">
     <br><br>
 
     <button type="submit">Submit</button>
@@ -36,21 +85,22 @@
 </form>
 
 <br>
-<a href="/admin">Back to Admin Dashboard</a>
+<a href="/admin">⬅ Back to Dashboard</a>
+
+</div>
 
 <script>
 
-function previewImage(event) {
+function previewImage() {
+    var url = document.getElementById("imageUrl").value;
+    var img = document.getElementById("preview");
 
-    var reader = new FileReader();
-
-    reader.onload = function() {
-        var output = document.getElementById('preview');
-        output.src = reader.result;
-        output.style.display = "block";
-    };
-
-    reader.readAsDataURL(event.target.files[0]);
+    if(url) {
+        img.src = url;
+        img.style.display = "block";
+    } else {
+        img.style.display = "none";
+    }
 }
 
 </script>
