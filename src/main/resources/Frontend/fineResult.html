@@ -11,18 +11,36 @@
             padding: 0;
         }
 
+        .header {
+            background: #0d47a1;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .header h1 {
+            margin: 5px;
+        }
+
         .container {
             width: 70%;
-            margin: 60px auto;
+            margin: 40px auto;
             background: #fff;
             padding: 30px;
             border-radius: 12px;
+            border: 2px solid #0d47a1;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
 
         h2 {
             text-align: center;
             color: #333;
+        }
+
+        .subtext {
+            text-align: center;
+            color: #777;
+            font-size: 14px;
         }
 
         table {
@@ -32,7 +50,7 @@
         }
 
         th {
-            background-color: #007bff;
+            background-color: #0d47a1;
             color: white;
             padding: 12px;
         }
@@ -45,6 +63,12 @@
 
         img {
             border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .no-image {
+            color: #999;
+            font-size: 12px;
         }
 
         .total {
@@ -94,21 +118,34 @@
         .btn-blue:hover {
             background: #0056b3;
         }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
     </style>
 </head>
 
 <body>
 
+<div class="header">
+    <h1>🚓 Traffic Police Department</h1>
+    <p>Government of India</p>
+</div>
+
 <div class="container">
 
-    <h2>🚓 Violation Details</h2>
+    <h2>Violation Details</h2>
+    <p class="subtext">Official Traffic Violation Record</p>
 
     <table>
         <tr>
             <th>Vehicle</th>
             <th>Violation</th>
             <th>Fine</th>
-            <th>Proof</th> <!-- 🔥 NEW COLUMN -->
+            <th>Proof</th>
         </tr>
 
         <tr th:each="v : ${violations}">
@@ -116,11 +153,16 @@
             <td th:text="${v.violationType}"></td>
             <td>₹ <span th:text="${v.fineAmount}"></span></td>
 
-            <!-- 🔥 IMAGE DISPLAY -->
             <td>
+                <!-- ✅ SHOW IMAGE -->
                 <img th:if="${v.imageName != null}"
                      th:src="@{'/uploads/' + ${v.imageName}}"
                      width="120" height="90"/>
+
+                <!-- ❌ FALLBACK -->
+                <span th:if="${v.imageName == null}" class="no-image">
+                    No Image
+                </span>
             </td>
         </tr>
     </table>
@@ -154,6 +196,10 @@
         </a>
     </div>
 
+</div>
+
+<div class="footer">
+    © 2026 Traffic Police Department
 </div>
 
 </body>

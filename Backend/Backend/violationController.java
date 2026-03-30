@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -88,7 +89,7 @@ public class violationController {
                 folder.mkdirs();
             }
 
-            String fileName = file.getOriginalFilename();
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
             file.transferTo(new File(uploadDir + fileName));
 
@@ -171,8 +172,8 @@ public class violationController {
         return "fineResult";
     }
 
-    // ✅ FIXED IMAGE SERVING (IMPORTANT)
-    @GetMapping("/uploads/{filename}")
+    // ✅ FINAL IMAGE FIX (WITH CONTENT TYPE)
+    @GetMapping(value = "/uploads/{filename}", produces = MediaType.IMAGE_JPEG_VALUE)
     @ResponseBody
     public byte[] getImage(@PathVariable String filename) throws IOException {
 
@@ -180,7 +181,7 @@ public class violationController {
         File file = new File(uploadDir + filename);
 
         if(!file.exists()) {
-            return new byte[0]; // prevent crash
+            return new byte[0];
         }
 
         return Files.readAllBytes(file.toPath());
