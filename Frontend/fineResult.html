@@ -2,58 +2,147 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Your Traffic Fines</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #e3f2fd, #f4f6f9);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 60%;
+            margin: 60px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .total {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .qr-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .qr-section img {
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #218838;
+        }
+
+        .btn-blue {
+            background: #007bff;
+        }
+
+        .btn-blue:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
+
 <body>
 
-<h2>Violation Details</h2>
+<div class="container">
 
-<table border="1">
+    <h2>🚓 Violation Details</h2>
 
-<tr>
-<th>Vehicle</th>
-<th>Violation</th>
-<th>Fine</th>
-</tr>
+    <table>
+        <tr>
+            <th>Vehicle</th>
+            <th>Violation</th>
+            <th>Fine</th>
+        </tr>
 
-<tr th:each="v : ${violations}">
-<td th:text="${v.vehicleNumber}"></td>
-<td th:text="${v.violationType}"></td>
-<td th:text="${v.fineAmount}"></td>
-</tr>
+        <tr th:each="v : ${violations}">
+            <td th:text="${v.vehicleNumber}"></td>
+            <td th:text="${v.violationType}"></td>
+            <td>₹ <span th:text="${v.fineAmount}"></span></td>
+        </tr>
+    </table>
 
-</table>
+    <div class="total">
+        Total Fine: ₹ <span th:text="${totalFine}"></span>
+    </div>
 
-<h3>Total Fine: ₹ <span th:text="${totalFine}"></span></h3>
+    <!-- ✅ PAYMENT SUCCESS -->
+    <div class="success" th:if="${paid}">
+        ✔ Payment Successful
+    </div>
 
-<br>
+    <!-- ❌ QR PAYMENT -->
+    <div class="qr-section" th:if="${!paid}">
+        <h3>Scan QR to Pay</h3>
 
-<!-- ✅ SHOW MESSAGE IF PAID -->
-<h3 style="color:green;" th:if="${paid}">
-    Payment Successful ✅
-</h3>
+        <img th:src="@{'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9381184308@axl&pn=TrafficFine&am=' + ${totalFine} + '&cu=INR'}"/>
 
-<!-- ❌ SHOW QR ONLY IF NOT PAID -->
-<div th:if="${!paid}">
+        <br>
 
-    <h3>Scan QR to Pay</h3>
+        <a th:href="@{'/checkPayment/' + ${violations[0].vehicleNumber}}">
+            <button class="btn btn-blue">Check Payment Status</button>
+        </a>
+    </div>
 
-    <img th:src="@{'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9381184308@axl&pn=TrafficFine&am=' + ${totalFine} + '&cu=INR'}"/>
+    <!-- ✅ DOWNLOAD RECEIPT -->
+    <div style="text-align:center;" th:if="${paid}">
+        <a th:href="@{'/downloadReceiptByVehicle/' + ${violations[0].vehicleNumber}}">
+            <button class="btn">Download Receipt</button>
+        </a>
+    </div>
 
-    <br><br>
-
-    <a th:href="@{'/checkPayment/' + ${violations[0].vehicleNumber}}">
-        <button>Check Payment Status</button>
-    </a>
-
-</div>
-
-<br><br>
-
-<!-- ✅ DOWNLOAD BUTTON ONLY AFTER PAYMENT -->
-<div th:if="${paid}">
-    <a th:href="@{'/downloadReceiptByVehicle/' + ${violations[0].vehicleNumber}}">
-        <button>Download Receipt</button>
-    </a>
 </div>
 
 </body>
