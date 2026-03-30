@@ -1,16 +1,11 @@
 package com.example.traffic.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.traffic.model.violation;
 import com.example.traffic.repository.violationRepository;
@@ -66,13 +61,13 @@ public class violationController {
         return "addViolation";
     }
 
-    // SAVE VIOLATION + IMAGE
+    // ✅ SAVE VIOLATION (WITH IMAGE URL)
     @PostMapping("/saveViolation")
     public String saveViolation(
             @RequestParam("vehicleNumber") String vehicleNumber,
             @RequestParam("violationType") String violationType,
             @RequestParam("fineAmount") double fineAmount,
-            @RequestParam("imageFile") MultipartFile file) throws IOException {
+            @RequestParam("imageUrl") String imageUrl) {
 
         violation v = new violation();
 
@@ -80,21 +75,8 @@ public class violationController {
         v.setViolationType(violationType);
         v.setFineAmount(fineAmount);
 
-        if(!file.isEmpty()) {
-
-            String uploadDir = System.getProperty("user.dir") + "/uploads/";
-            File folder = new File(uploadDir);
-
-            if(!folder.exists()) {
-                folder.mkdirs();
-            }
-
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-
-            file.transferTo(new File(uploadDir + fileName));
-
-            v.setImageName(fileName);
-        }
+        // 🔥 store image URL directly
+        v.setImageName(imageUrl);
 
         repository.save(v);
 
@@ -170,21 +152,6 @@ public class violationController {
         model.addAttribute("paid", true);
 
         return "fineResult";
-    }
-
-    // ✅ FINAL IMAGE FIX (WITH CONTENT TYPE)
-    @GetMapping(value = "/uploads/{filename}", produces = MediaType.IMAGE_JPEG_VALUE)
-    @ResponseBody
-    public byte[] getImage(@PathVariable String filename) throws IOException {
-
-        String uploadDir = System.getProperty("user.dir") + "/uploads/";
-        File file = new File(uploadDir + filename);
-
-        if(!file.exists()) {
-            return new byte[0];
-        }
-
-        return Files.readAllBytes(file.toPath());
     }
 
     // RECEIPT
