@@ -20,7 +20,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        input {
+        input, button {
             width: 90%;
             padding: 8px;
             margin-top: 5px;
@@ -30,11 +30,9 @@
 
         button {
             margin-top: 15px;
-            padding: 10px 15px;
             background: #007bff;
             color: white;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
         }
 
@@ -55,7 +53,8 @@
 
 <h2>🚓 Add Traffic Violation</h2>
 
-<form action="/saveViolation" method="post">
+<!-- Note the enctype for file upload -->
+<form action="/saveViolation" method="post" enctype="multipart/form-data">
 
     <label>Vehicle Number:</label><br>
     <input type="text" name="vehicleNumber" required>
@@ -69,11 +68,9 @@
     <input type="number" name="fineAmount" required>
     <br><br>
 
-    <!-- 🔥 NEW: IMAGE URL INPUT -->
-    <label>Violation Image URL:</label><br>
-    <input type="text" id="imageUrl" name="imageUrl" 
-           placeholder="Paste direct image link (.jpg/.png)" 
-           oninput="previewImage()">
+    <!-- 🔥 IMAGE UPLOAD INPUT -->
+    <label>Upload Violation Image:</label><br>
+    <input type="file" id="imageFile" name="imageFile" accept="image/*" onchange="previewImage()">
     <br><br>
 
     <p>Image Preview:</p>
@@ -90,19 +87,21 @@
 </div>
 
 <script>
-
 function previewImage() {
-    var url = document.getElementById("imageUrl").value;
+    var fileInput = document.getElementById("imageFile");
     var img = document.getElementById("preview");
 
-    if(url) {
-        img.src = url;
-        img.style.display = "block";
+    if(fileInput.files && fileInput.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            img.src = e.target.result;
+            img.style.display = "block";
+        }
+        reader.readAsDataURL(fileInput.files[0]);
     } else {
         img.style.display = "none";
     }
 }
-
 </script>
 
 </body>
